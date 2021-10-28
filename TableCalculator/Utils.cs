@@ -110,7 +110,7 @@ namespace TableCalculator
                         len++;
                 }
             }
-            if (len < 1)
+            if (len < 2)
                 return "…";
             if (len > 15)
                 len = 15;

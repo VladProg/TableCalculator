@@ -34,7 +34,7 @@ namespace TableCalculator
             System.Windows.Forms.Button buttonAddColumn;
             System.Windows.Forms.Button buttonRemoveRow;
             System.Windows.Forms.Button buttonAddRow;
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panel1 = new System.Windows.Forms.Panel();
             this.textBoxExpression = new System.Windows.Forms.TextBox();
             this.textBoxId = new System.Windows.Forms.TextBox();
@@ -142,7 +142,6 @@ namespace TableCalculator
             this.textBoxExpression.TabStop = false;
             this.textBoxExpression.TextChanged += new System.EventHandler(this.textBoxExpression_TextChanged);
             this.textBoxExpression.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxExpression_KeyDown);
-            this.textBoxExpression.Leave += new System.EventHandler(this.textBoxExpression_Leave);
             this.textBoxExpression.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxExpression_Validating);
             // 
             // textBoxId
@@ -167,12 +166,13 @@ namespace TableCalculator
             this.dataGridView.MultiSelect = false;
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView.RowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView.RowTemplate.Height = 29;
             this.dataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dataGridView.Size = new System.Drawing.Size(760, 352);
             this.dataGridView.TabIndex = 0;
+            this.dataGridView.TabStop = false;
             this.dataGridView.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView_CellBeginEdit);
             this.dataGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellEndEdit);
             this.dataGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dataGridView_CellValidating);
@@ -181,8 +181,6 @@ namespace TableCalculator
             this.dataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.dataGridView_CurrentCellDirtyStateChanged);
             this.dataGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dataGridView_EditingControlShowing);
             this.dataGridView.SelectionChanged += new System.EventHandler(this.dataGridView_SelectionChanged);
-            this.dataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView_KeyDown);
-            this.dataGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.dataGridView_PreviewKeyDown);
             // 
             // panel2
             // 
