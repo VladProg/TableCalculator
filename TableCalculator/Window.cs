@@ -55,7 +55,7 @@ namespace TableCalculator
 
         private void FillDataGrivView()
         {
-            dataGridView.SelectionChanged -= dataGridView_SelectionChanged;
+            dataGridView.CurrentCellChanged -= dataGridView_CurrentCellChanged;
             for (int col = dataGridView.ColumnCount - 1; col >= 0; col--)
                 dataGridView.Columns.RemoveAt(col);
             for (int col = 0; col < _table.ColumnCount; col++)
@@ -72,7 +72,7 @@ namespace TableCalculator
             for (int col = 0; col < _table.ColumnCount; col++)
                 for (int row = 0; row < _table.RowCount; row++)
                     WriteToCell(col, row);
-            dataGridView.SelectionChanged += dataGridView_SelectionChanged;
+            dataGridView.CurrentCellChanged += dataGridView_CurrentCellChanged;
         }
 
         public Window()
@@ -93,6 +93,7 @@ namespace TableCalculator
             else
                 _table = new(5, 5);
             FillDataGrivView();
+            dataGridView.Select();
         }
 
         private void dataGridView_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
@@ -116,7 +117,7 @@ namespace TableCalculator
                     var (col, row) = Utils.CellIdToNumbers(id);
                     WriteToCell(col, row);
                 }
-                dataGridView_SelectionChanged(dataGridView, new());
+                dataGridView_CurrentCellChanged(dataGridView, new());
                 return true;
             }
             catch (SyntaxErrorException)
@@ -144,15 +145,6 @@ namespace TableCalculator
                 dataGridView.BeginEdit(false);
                 dataGridView.CellBeginEdit += dataGridView_CellBeginEdit;
             }
-        }
-
-        private void dataGridView_SelectionChanged(object sender, EventArgs e)
-        {
-            string id = CellId();
-            textBoxId.Text = id;
-            textBoxExpression.TextChanged -= textBoxExpression_TextChanged;
-            textBoxExpression.Text = _table.Contains(id) ? _table.GetExpression(id) : "";
-            textBoxExpression.TextChanged += textBoxExpression_TextChanged;
         }
 
         private void dataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -184,6 +176,7 @@ namespace TableCalculator
 
         private void buttonAddColumn_Click(object sender, EventArgs e)
         {
+            dataGridView.Select();
             _table.ColumnCount++;
             int i = dataGridView.ColumnCount;
             dataGridView.Columns.Add(Utils.ColumnNumberToId(i), Utils.ColumnNumberToId(i));
@@ -193,6 +186,7 @@ namespace TableCalculator
 
         private void buttonAddRow_Click(object sender, EventArgs e)
         {
+            dataGridView.Select();
             _table.RowCount++;
             int i = dataGridView.RowCount;
             dataGridView.Rows.Add();
@@ -201,6 +195,7 @@ namespace TableCalculator
 
         private void buttonRemoveColumn_Click(object sender, EventArgs e)
         {
+            dataGridView.Select();
             try
             {
                 _table.ColumnCount--;
@@ -225,6 +220,7 @@ namespace TableCalculator
 
         private void buttonRemoveRow_Click(object sender, EventArgs e)
         {
+            dataGridView.Select();
             try
             {
                 _table.RowCount--;
@@ -286,7 +282,7 @@ namespace TableCalculator
         bool SaveAs()
         {
             SaveFileDialog sfd = new();
-            sfd.Filter = "Таблиці|*.tc";
+            sfd.Filter = "Таблиця|*.tc";
             sfd.Title = "Зберегти як";
             sfd.DefaultExt = "tc";
             if (_table.FileName is not null)
@@ -388,9 +384,13 @@ namespace TableCalculator
                 return;
             expressionsToolStripMenuItem.Checked = true;
             valuesToolStripMenuItem.Checked = false;
+            dataGridView.DefaultCellStyle.WrapMode = DataGridViewTriState.False;
             for (int col = 0; col < dataGridView.ColumnCount; col++)
                 for (int row = 0; row < dataGridView.RowCount; row++)
+                {
+                    dataGridView[col, row].Style.WrapMode = DataGridViewTriState.False;
                     WriteToCell(col, row);
+                }
         }
 
         private void valuesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -399,9 +399,13 @@ namespace TableCalculator
                 return;
             expressionsToolStripMenuItem.Checked = false;
             valuesToolStripMenuItem.Checked = true;
+            dataGridView.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
             for (int col = 0; col < dataGridView.ColumnCount; col++)
                 for (int row = 0; row < dataGridView.RowCount; row++)
+                {
+                    dataGridView[col, row].Style.WrapMode = DataGridViewTriState.True;
                     WriteToCell(col, row);
+                }
         }
 
         private void textBoxExpression_KeyDown(object sender, KeyEventArgs e)
@@ -411,7 +415,7 @@ namespace TableCalculator
                 case Keys.Enter when Apply(dataGridView.CurrentCell.Value as string):
                     dataGridView.Focus();
                     dataGridView.CurrentCell = dataGridView[Column(), Math.Min(Row() + 1, dataGridView.RowCount - 1)];
-                    dataGridView_SelectionChanged(dataGridView, new());
+                    dataGridView_CurrentCellChanged(dataGridView, new());
                     e.Handled = true;
                     e.SuppressKeyPress = true;
                     break;
@@ -421,14 +425,14 @@ namespace TableCalculator
                         dataGridView.CurrentCell = dataGridView[Column() + 1, Row()];
                     else if (Row() != dataGridView.RowCount - 1)
                         dataGridView.CurrentCell = dataGridView[0, Row() + 1];
-                    dataGridView_SelectionChanged(dataGridView, new());
+                    dataGridView_CurrentCellChanged(dataGridView, new());
                     e.Handled = true;
                     e.SuppressKeyPress = true;
                     break;
                 case Keys.Escape:
                     Apply(_table.Contains(CellId()) ? _table.GetExpression(CellId()) : "");
                     dataGridView.Focus();
-                    dataGridView_SelectionChanged(dataGridView, new());
+                    dataGridView_CurrentCellChanged(dataGridView, new());
                     e.Handled = true;
                     e.SuppressKeyPress = true;
                     break;
@@ -446,7 +450,7 @@ namespace TableCalculator
                         if (col >= dataGridView.ColumnCount || row >= dataGridView.RowCount)
                             throw new ArgumentException();
                         dataGridView.CurrentCell = dataGridView[col, row];
-                        dataGridView_SelectionChanged(dataGridView, new());
+                        dataGridView_CurrentCellChanged(dataGridView, new());
                         dataGridView.Focus();
                     }
                     catch (ArgumentException)
@@ -475,5 +479,27 @@ namespace TableCalculator
 
         private void textBoxExpression_Validating(object sender, System.ComponentModel.CancelEventArgs e)
             => e.Cancel = !Apply(textBoxExpression.Text);
+
+        private void dataGridView_CurrentCellChanged(object sender, EventArgs e)
+        {
+            if (dataGridView.CurrentCell is null)
+                return;
+            string id = CellId();
+            textBoxId.Text = id;
+            textBoxExpression.TextChanged -= textBoxExpression_TextChanged;
+            textBoxExpression.Text = _table.Contains(id) ? _table.GetExpression(id) : "";
+            textBoxExpression.TextChanged += textBoxExpression_TextChanged;
+        }
+
+        private void dataGridView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+                Apply("");
+            if (e.KeyCode == Keys.Back)
+            {
+                Apply("");
+                dataGridView.BeginEdit(true);
+            }
+        }
     }
 }

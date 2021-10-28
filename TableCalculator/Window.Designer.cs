@@ -34,7 +34,7 @@ namespace TableCalculator
             System.Windows.Forms.Button buttonAddColumn;
             System.Windows.Forms.Button buttonRemoveRow;
             System.Windows.Forms.Button buttonAddRow;
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panel1 = new System.Windows.Forms.Panel();
             this.textBoxExpression = new System.Windows.Forms.TextBox();
             this.textBoxId = new System.Windows.Forms.TextBox();
@@ -76,6 +76,7 @@ namespace TableCalculator
             // buttonRemoveColumn
             // 
             buttonRemoveColumn.Dock = System.Windows.Forms.DockStyle.Top;
+            buttonRemoveColumn.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             buttonRemoveColumn.Location = new System.Drawing.Point(0, 40);
             buttonRemoveColumn.Name = "buttonRemoveColumn";
             buttonRemoveColumn.Size = new System.Drawing.Size(40, 40);
@@ -88,6 +89,7 @@ namespace TableCalculator
             // buttonAddColumn
             // 
             buttonAddColumn.Dock = System.Windows.Forms.DockStyle.Top;
+            buttonAddColumn.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             buttonAddColumn.Location = new System.Drawing.Point(0, 0);
             buttonAddColumn.Name = "buttonAddColumn";
             buttonAddColumn.Size = new System.Drawing.Size(40, 40);
@@ -100,6 +102,7 @@ namespace TableCalculator
             // buttonRemoveRow
             // 
             buttonRemoveRow.Dock = System.Windows.Forms.DockStyle.Left;
+            buttonRemoveRow.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             buttonRemoveRow.Location = new System.Drawing.Point(40, 0);
             buttonRemoveRow.Name = "buttonRemoveRow";
             buttonRemoveRow.Size = new System.Drawing.Size(40, 40);
@@ -112,6 +115,7 @@ namespace TableCalculator
             // buttonAddRow
             // 
             buttonAddRow.Dock = System.Windows.Forms.DockStyle.Left;
+            buttonAddRow.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             buttonAddRow.Location = new System.Drawing.Point(0, 0);
             buttonAddRow.Name = "buttonAddRow";
             buttonAddRow.Size = new System.Drawing.Size(40, 40);
@@ -161,13 +165,19 @@ namespace TableCalculator
             this.dataGridView.AllowUserToDeleteRows = false;
             this.dataGridView.AllowUserToResizeRows = false;
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView.DefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView.Location = new System.Drawing.Point(0, 58);
             this.dataGridView.MultiSelect = false;
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView.RowTemplate.Height = 29;
             this.dataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dataGridView.Size = new System.Drawing.Size(760, 352);
@@ -178,9 +188,10 @@ namespace TableCalculator
             this.dataGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dataGridView_CellValidating);
             this.dataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellValueChanged);
             this.dataGridView.ColumnWidthChanged += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dataGridView_ColumnWidthChanged);
+            this.dataGridView.CurrentCellChanged += new System.EventHandler(this.dataGridView_CurrentCellChanged);
             this.dataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.dataGridView_CurrentCellDirtyStateChanged);
             this.dataGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dataGridView_EditingControlShowing);
-            this.dataGridView.SelectionChanged += new System.EventHandler(this.dataGridView_SelectionChanged);
+            this.dataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView_KeyDown);
             // 
             // panel2
             // 

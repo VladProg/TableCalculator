@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 
@@ -82,40 +83,11 @@ namespace TableCalculator
             throw new ArgumentException("Cell id is incorrect", nameof(id));
         }
 
-        public static string DoubleToString(double d,int width)
+        private static string TryDoubleToString(double d, int len, string format)
         {
-            int len = (int)(width / 8.2 - 1);
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-            string approx = d.ToString();
-            bool scientific = false;
-            if (approx.Contains('E'))
-            {
-                len -= approx.Length - approx.IndexOf('E');
-                if (approx.Contains('.'))
-                    len++;
-            }
-            else
-            {
-                int whole = approx.IndexOf('.');
-                if (whole == -1)
-                    whole = approx.Length;
-                if (whole > len)
-                {
-                    scientific = true;
-                    approx = d.ToString("E");
-                    len -= approx.Length - approx.IndexOf('E');
-                    if (approx.Contains('.'))
-                        len++;
-                    for (int i = approx.IndexOf('E') + 2; i < approx.Length && approx[i] == '0'; i++)
-                        len++;
-                }
-            }
-            if (len < 2)
-                return "…";
-            if (len > 15)
-                len = 15;
-            double eps = 5 * Math.Pow(10, -len);
-            string res = (d * (1 + eps)).ToString(scientific ? "E" : null);
+            double eps = 5 * Math.Pow(10, -len - 1);
+            string res = (d * (1 + eps)).ToString(format);
+            //Debug.Write(d + " " + len + " " + format + " -> " + res);
             string end = "";
             if (res.Contains('E'))
             {
@@ -123,7 +95,7 @@ namespace TableCalculator
                 end = res[pos..];
                 res = res[..pos];
             }
-            while (res.Length > len && !res.EndsWith("."))
+            while (res.Length - (res.Contains('.') ? 1 : 0) > len && !res.EndsWith("."))
                 res = res[0..^1];
             while (res.EndsWith("0"))
                 res = res[0..^1];
@@ -135,7 +107,31 @@ namespace TableCalculator
                 end = end.Remove(2, 1);
             if (end.Length == 2)
                 end = "";
-            return res + end;
+            //Debug.WriteLine(" -> " + res + end);
+            if (!res.Contains('.') && res.Length > len)
+                return null;
+            else
+                return res + end;
+        }
+
+        public static string DoubleToString(double d,int width)
+        {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+            int len = (int)(width / 8.2 - 1);
+            string ans = "…";
+            for (int i = 1; i <= 15; i++)
+            {
+                string cur = TryDoubleToString(d, i, "E20");
+                if (cur.Length - (cur.Contains('.') ? 1 : 0) <= len)
+                    ans = cur;
+            }
+            for (int i = 1; i <= 15; i++)
+            {
+                string cur = TryDoubleToString(d, i, "F20");
+                if (cur is not null && cur.Length - (cur.Contains('.') ? 1 : 0) <= len)
+                    ans = cur;
+            }
+            return ans;
         }
     }
 }
