@@ -13,29 +13,6 @@ namespace TableCalculator
         private Table _table;
         private bool _wasCycle = false;
 
-        private bool Lock(object except, Control cur = null)
-        {
-            if (cur is null)
-                cur = this;
-            if (cur == except)
-                return true;
-            bool found = false;
-            foreach (Control to in cur.Controls)
-                found |= Lock(except, to);
-            if (!found)
-                cur.Enabled = false;
-            return found;
-        }
-
-        private void Unlock(Control cur = null)
-        {
-            if (cur is null)
-                cur = this;
-            foreach (Control to in cur.Controls)
-                Unlock(to);
-            cur.Enabled = true;
-        }
-
         private void WriteToCell(int col, int row)
         {
             if (dataGridView.CurrentCell is not null
@@ -96,7 +73,6 @@ namespace TableCalculator
                 for (int row = 0; row < _table.RowCount; row++)
                     WriteToCell(col, row);
             dataGridView.SelectionChanged += dataGridView_SelectionChanged;
-            Unlock();
         }
 
         public Window()
@@ -125,9 +101,6 @@ namespace TableCalculator
             {
                 tb.PreviewKeyDown -= dataGridView_TextBox_PreviewKeyDown;
                 tb.PreviewKeyDown += dataGridView_TextBox_PreviewKeyDown;
-                tb.KeyDown -= dataGridView_TextBox_KeyDown;
-                tb.KeyDown += dataGridView_TextBox_KeyDown;
-                tb.TabStop = false;
             }
         }
 
@@ -137,15 +110,13 @@ namespace TableCalculator
                 return true;
             try
             {
-                List<string> changed = _table.ChangeOrDeleteCell(Utils.CellNumbersToId(Column(), Row()),
-                                                                 expression);
+                List<string> changed = _table.ChangeOrDeleteCell(Utils.CellNumbersToId(Column(), Row()), expression);
                 foreach (var id in changed)
                 {
                     var (col, row) = Utils.CellIdToNumbers(id);
                     WriteToCell(col, row);
                 }
                 dataGridView_SelectionChanged(dataGridView, new());
-                Unlock();
                 return true;
             }
             catch (SyntaxErrorException)
@@ -162,19 +133,7 @@ namespace TableCalculator
 
         private void dataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            if (!Apply(dataGridView.CurrentCell.Value as string))
-            {
-                void dataGridView_SelectionChanged_Error(object sender, EventArgs e1)
-                {
-                    dataGridView.CurrentCell = dataGridView[e.ColumnIndex, e.RowIndex];
-                    dataGridView_SelectionChanged(dataGridView, new());
-                    dataGridView.CellBeginEdit -= dataGridView_CellBeginEdit;
-                    dataGridView.BeginEdit(true);
-                    dataGridView.CellBeginEdit += dataGridView_CellBeginEdit;
-                    dataGridView.SelectionChanged -= dataGridView_SelectionChanged_Error;
-                };
-                dataGridView.SelectionChanged += dataGridView_SelectionChanged_Error;
-            }
+            //WriteToCell(e.ColumnIndex, e.RowIndex);
         }
 
         private void dataGridView_SelectionChanged(object sender, EventArgs e)
@@ -192,9 +151,6 @@ namespace TableCalculator
                 row = Row();
             if (col == -1 || row == -1)
                 return;
-            if (!dataGridView.Enabled)
-                return;
-            Lock(sender);
             string id = Utils.CellNumbersToId(col, row);
             textBoxId.Text = id;
             textBoxExpression.Text = dataGridView[col, row].Value as string;
@@ -217,9 +173,9 @@ namespace TableCalculator
 
         private void textBoxExpression_TextChanged(object sender, EventArgs e)
         {
-            if (!textBoxExpression.Enabled)
-                return;
-            Lock(sender);
+            //if (!textBoxExpression.Enabled)
+            //    return;
+            //Lock(sender);
             dataGridView.CurrentCell.Value = textBoxExpression.Text;
         }
 
@@ -288,19 +244,26 @@ namespace TableCalculator
             dataGridView.Rows.RemoveAt(dataGridView.Rows.Count - 1);
         }
 
-        private void textBoxExpression_Leave(object sender, EventArgs e)
-        {
-            if (Apply(textBoxExpression.Text))
-            {
-                dataGridView.Focus();
-                dataGridView_SelectionChanged(dataGridView, new());
-            }
-            else
-                textBoxExpression.Focus();
-        }
+        private void textBoxExpression_Leave(object sender, EventArgs e) { }
 
         private void textBoxId_Leave(object sender, EventArgs e)
             => textBoxId.Text = CellId();
+
+        bool CanCLick()
+        {
+            if (dataGridView.IsCurrentCellInEditMode)
+            {
+                textBoxExpression.Focus();
+                dataGridView.Focus();
+                return !dataGridView.IsCurrentCellInEditMode;
+            }
+            else if (textBoxExpression.Focused)
+            {
+                dataGridView.Focus();
+                return !textBoxExpression.Focused;
+            }
+            return true;
+        }
 
         bool Save()
         {
@@ -346,10 +309,18 @@ namespace TableCalculator
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-            => Save();
+        {
+            if (!CanCLick())
+                return;
+            Save();
+        }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
-            => SaveAs();
+        {
+            if (!CanCLick())
+                return;
+            SaveAs();
+        }
 
         private bool CheckSaved()
         {
@@ -365,13 +336,19 @@ namespace TableCalculator
         }
 
         private void Window_FormClosing(object sender, FormClosingEventArgs e)
-            => e.Cancel = !menuStrip.Enabled || !CheckSaved();
+            => e.Cancel = dataGridView.IsCurrentCellInEditMode || textBoxExpression.Focused || !CheckSaved();
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
-            => Close();
+        {
+            if (!CanCLick())
+                return;
+            Close();
+        }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!CanCLick())
+                return;
             if (!CheckSaved())
                 return;
             _table = new(5, 5);
@@ -380,6 +357,8 @@ namespace TableCalculator
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!CanCLick())
+                return;
             if (!CheckSaved())
                 return;
             OpenFileDialog ofd = new();
@@ -409,6 +388,8 @@ namespace TableCalculator
 
         private void expressionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!CanCLick())
+                return;
             if (expressionsToolStripMenuItem.Checked)
                 return;
             expressionsToolStripMenuItem.Checked = true;
@@ -416,11 +397,12 @@ namespace TableCalculator
             for (int col = 0; col < dataGridView.ColumnCount; col++)
                 for (int row = 0; row < dataGridView.RowCount; row++)
                     WriteToCell(col, row);
-            Unlock();
         }
 
         private void valuesToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!CanCLick())
+                return;
             if (valuesToolStripMenuItem.Checked)
                 return;
             expressionsToolStripMenuItem.Checked = false;
@@ -428,7 +410,6 @@ namespace TableCalculator
             for (int col = 0; col < dataGridView.ColumnCount; col++)
                 for (int row = 0; row < dataGridView.RowCount; row++)
                     WriteToCell(col, row);
-            Unlock();
         }
 
         private void textBoxExpression_KeyDown(object sender, KeyEventArgs e)
@@ -508,9 +489,8 @@ namespace TableCalculator
         {
             //Debug.WriteLine("dataGridView_TextBox_PreviewKeyDown " + e.KeyCode);
             //e.IsInputKey = false;
-            if (e.KeyCode != Keys.Escape)
-                return;
-            dataGridView.CurrentCell.Value = _table.Contains(CellId()) ? _table.GetExpression(CellId()) : "";
+            if (e.KeyCode == Keys.Escape)
+                dataGridView.CurrentCell.Value = _table.Contains(CellId()) ? _table.GetExpression(CellId()) : "";
         }
 
         private void dataGridView_TextBox_KeyDown(object sender, KeyEventArgs e)
@@ -519,5 +499,14 @@ namespace TableCalculator
             //e.Handled = true;
             //e.SuppressKeyPress = true;
         }
+
+        private void dataGridView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        {
+            Debug.WriteLine("dataGridView_CellValidating: " + (e.FormattedValue as string));
+            e.Cancel = dataGridView.IsCurrentCellInEditMode && !Apply(e.FormattedValue as string);
+        }
+
+        private void textBoxExpression_Validating(object sender, System.ComponentModel.CancelEventArgs e)
+            => e.Cancel = !Apply(textBoxExpression.Text);
     }
 }
