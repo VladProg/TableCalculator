@@ -1,8 +1,6 @@
 ﻿using Antlr4.Runtime;
-using System.Linq;
 using System.Collections.Generic;
 using System;
-using System.Diagnostics;
 
 namespace TableCalculator.Calculating
 {

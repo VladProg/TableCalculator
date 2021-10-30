@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 
@@ -36,7 +35,7 @@ namespace TableCalculator
             foreach (char c in id)
                 if (c < 'A' || c > 'Z')
                     throw new ArgumentException("Id must contain only English letters", nameof(id));
-            if(id.Length>6)
+            if (id.Length > 6)
                 throw new ArgumentOutOfRangeException(nameof(id));
             id = id.ToUpper();
             int number = 0;
@@ -85,9 +84,7 @@ namespace TableCalculator
 
         private static string TryDoubleToString(double d, int len, string format)
         {
-            double eps = 5 * Math.Pow(10, -len - 1);
-            string res = (d * (1 + eps)).ToString(format);
-            //Debug.Write(d + " " + len + " " + format + " -> " + res);
+            string res = d.ToString(format + len.ToString());
             string end = "";
             if (res.Contains('E'))
             {
@@ -95,10 +92,9 @@ namespace TableCalculator
                 end = res[pos..];
                 res = res[..pos];
             }
-            while (res.Length - (res.Contains('.') ? 1 : 0) > len && !res.EndsWith("."))
-                res = res[0..^1];
-            while (res.EndsWith("0"))
-                res = res[0..^1];
+            if(res.Contains('.'))
+                while (res.EndsWith("0"))
+                    res = res[0..^1];
             if (res.EndsWith("."))
                 res = res[0..^1];
             if (res == "" || res == "-")
@@ -107,28 +103,43 @@ namespace TableCalculator
                 end = end.Remove(2, 1);
             if (end.Length == 2)
                 end = "";
-            //Debug.WriteLine(" -> " + res + end);
-            if (!res.Contains('.') && res.Length > len)
-                return null;
-            else
-                return res + end;
+            return res + end;
         }
 
-        public static string DoubleToString(double d,int width)
+        private static int SignificantDigits(string res)
+        {
+            int cnt = 0;
+            foreach (char c in res)
+                if (c == 'E')
+                    return cnt;
+                else if ('1' <= c && c <= '9' || c != '.' && cnt > 0)
+                    cnt++;
+            return cnt;
+        }
+
+        public static string DoubleToString(double d, int width)
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+            if (d == 0)
+                return "0";
             int len = (int)(width / 8.2 - 1);
             string ans = "…";
-            for (int i = 1; i <= 15; i++)
+            for (int i = 0; i <= 15; i++)
             {
-                string cur = TryDoubleToString(d, i, "E20");
-                if (cur.Length - (cur.Contains('.') ? 1 : 0) <= len)
+                string cur = TryDoubleToString(d, i, "E");
+                if (cur != "0"
+                        && cur.Length - (cur.Contains('.') ? 1 : 0) <= len
+                        && SignificantDigits(cur) >= SignificantDigits(ans)
+                        && SignificantDigits(cur) <= 15)
                     ans = cur;
             }
-            for (int i = 1; i <= 15; i++)
+            for (int i = 0; i <= 15; i++)
             {
-                string cur = TryDoubleToString(d, i, "F20");
-                if (cur is not null && cur.Length - (cur.Contains('.') ? 1 : 0) <= len)
+                string cur = TryDoubleToString(d, i, "F");
+                if (cur != "0"
+                        && cur.Length - (cur.Contains('.') ? 1 : 0) <= len
+                        && SignificantDigits(cur) >= SignificantDigits(ans)
+                        && SignificantDigits(cur) <= 15)
                     ans = cur;
             }
             return ans;

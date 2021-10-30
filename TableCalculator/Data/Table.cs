@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using TableCalculator.Calculating;
 
@@ -139,7 +138,7 @@ namespace TableCalculator.Data
                 return DeleteCell(id);
         }
 
-        public List<string> ChangeCell(string id, string expression)
+        private List<string> ChangeCell(string id, string expression)
         {
             if (!Exsists(id))
                 throw new ArgumentOutOfRangeException(nameof(id));
@@ -160,7 +159,7 @@ namespace TableCalculator.Data
             return changed;
         }
 
-        public List<string> DeleteCell(string id)
+        private List<string> DeleteCell(string id)
         {
             _cells.Remove(id);
             List<string> changed = _graph.ChangeNode(id, new());

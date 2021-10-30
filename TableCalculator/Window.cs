@@ -419,6 +419,16 @@ namespace TableCalculator
                     e.Handled = true;
                     e.SuppressKeyPress = true;
                     break;
+                case Keys.Tab when e.Shift && Apply(dataGridView.CurrentCell.Value as string):
+                    dataGridView.Focus();
+                    if (Column() != 0)
+                        dataGridView.CurrentCell = dataGridView[Column() - 1, Row()];
+                    else if (Row() != 0)
+                        dataGridView.CurrentCell = dataGridView[dataGridView.ColumnCount - 1, Row() - 1];
+                    dataGridView_CurrentCellChanged(dataGridView, new());
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
+                    break;
                 case Keys.Tab when Apply(dataGridView.CurrentCell.Value as string):
                     dataGridView.Focus();
                     if (Column() != dataGridView.ColumnCount - 1)
@@ -500,6 +510,80 @@ namespace TableCalculator
                 Apply("");
                 dataGridView.BeginEdit(true);
             }
+        }
+
+        private void possibilitiesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form form = new();
+            form.Size = new(810, 540);
+            RichTextBox rtb = new();
+            form.Controls.Add(rtb);
+            rtb.Dock = DockStyle.Fill;
+            rtb.ReadOnly = true;
+            rtb.Text = "Табличний калькулятор дозволяє обчислювати вирази і записувати їх значення в таблицю.\n" +
+                       "\n" +
+                       "Детальніше про формат виразів: \"Довідка\" → \"Формат виразів\".\n" +
+                       "\n" +
+                       "Вирази можна вводити і редагувати як у комірці, так і в полі над таблицею.\n" +
+                       "Якщо ввести некоректний вираз, одразу з'явиться повідомлення про це.\n" +
+                       "Циклічні посилання позначаються спеціальним символом \"⭯\".\n" +
+                       "У лівому верхньому куті є поле з виділеною коміркою, його можна редагувати, щоб потрапити в іншу комірку.\n" +
+                       "\n" +
+                       "У правому верхньому куті є кнопки \"+\" і \"-\", щоб додавати і видаляти останній стовпчик відповідно.\n" +
+                       "У лівому нижньому куті є кнопки \"+\" і \"-\", щоб додавати і видаляти останній рядок відповідно.\n" +
+                       "\n" +
+                       "Меню \"Файл\" дозволяє:\n" +
+                       "• \"Створити\" – створити нову порожню таблицю,\n" +
+                       "• \"Відкрити\" – відкрити таблицю з існуючого файла, \n" +
+                       "• \"Зберегти\" – зберегти поточний файл, \n" +
+                       "• \"Зберегти як\" – зберегти поточну таблицю в новий файл,\n" +
+                       "• \"Закрити\" – закрити програму.\n" +
+                       "\n" +
+                       "Можна змінювати ширину стовпчиків, при цьому всі числа оруглюються, щоб не виходити за межі комірки.\n" +
+                       "\n" +
+                       "Меню \"Вигляд\" дозволяє змінювати інформацію, що відображається в комірках: \"Вирази\"/\"Значення\".\n" +
+                       "\n" +
+                       "У меню \"Довідка\" можна знайти інформацію про цю програму і про те, як нею користуватися.";
+            form.Show();
+        }
+
+        private void expressionsToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Form form = new();
+            form.Size = new(700, 320);
+            RichTextBox rtb = new();
+            form.Controls.Add(rtb);
+            rtb.Dock = DockStyle.Fill;
+            rtb.ReadOnly = true;
+            rtb.Text = "При побудові виразів використовуються:\n" +
+                       "1. цілі числа довільної довжини\n" +
+                       "2. круглі дужки\n" +
+                       "3. імена клітинок (напр., А3)\n" +
+                       "4. операції та функції, які для кожного із варіантів лабораторної роботи визначаються окремо.\n" +
+                       "\n" +
+                       "У мене варіант 7 з набором операцій 1, 2, 4, 7:\n" +
+                       "1) +, -, *, / (бінарні операції);\n" +
+                       "2) mod, dіv;\n" +
+                       "4) ^ (піднесення у степінь);\n" +
+                       "7) mmax(x1,x2,...,xN), mmіn(x1,x2,...,xN) (N>=1).\n" +
+                       "\n" +
+                       "Всі літери можна вводити у будь-якому регістрі.";
+            form.Show();
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form form = new();
+            form.Size = new(450, 120);
+            RichTextBox rtb = new();
+            form.Controls.Add(rtb);
+            rtb.Dock = DockStyle.Fill;
+            rtb.ReadOnly = true;
+            rtb.Text = "Табличний калькулятор – версія 1.0.\n" +
+                       "Розробник – Владислав Заводник\n" +
+                       "Вихідний код – https://github.com/VladProg/TableCalculator.";
+            rtb.LinkClicked += (sender, e) => Process.Start("explorer.exe", e.LinkText);
+            form.Show();
         }
     }
 }

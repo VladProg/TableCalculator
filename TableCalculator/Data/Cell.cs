@@ -10,8 +10,5 @@
             Expression = expression;
             Result = result;
         }
-
-        public void SetExpression(string expression) => Expression = expression;
-        public void SetResult(double? result) => Result = result;
     }
 }
