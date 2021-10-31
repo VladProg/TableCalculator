@@ -515,7 +515,7 @@ namespace TableCalculator
         private void possibilitiesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Form form = new();
-            form.Size = new(810, 540);
+            form.Size = new(810, 560);
             RichTextBox rtb = new();
             form.Controls.Add(rtb);
             rtb.Dock = DockStyle.Fill;
@@ -538,6 +538,7 @@ namespace TableCalculator
                        "• \"Зберегти\" – зберегти поточний файл, \n" +
                        "• \"Зберегти як\" – зберегти поточну таблицю в новий файл,\n" +
                        "• \"Закрити\" – закрити програму.\n" +
+                       "Збережений файл можна знайти у провіднику і \"відкрити за допомогою\" цієї програми.\n" +
                        "\n" +
                        "Можна змінювати ширину стовпчиків, при цьому всі числа оруглюються, щоб не виходити за межі комірки.\n" +
                        "\n" +
