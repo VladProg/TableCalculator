@@ -5,7 +5,7 @@ using TableCalculator.Calculating;
 
 namespace TableCalculator.Data
 {
-    class Table
+    public class Table
     {
         private readonly Dictionary<string, Cell> _cells = new();
         private readonly Graph _graph = new();
@@ -87,7 +87,7 @@ namespace TableCalculator.Data
                         if (Contains(Utils.CellNumbersToId(_columnCount - 1, row)))
                             throw new DeleteLineNotEmptyException();
                     for (int row = 0; row < RowCount; row++)
-                        if (_graph.IsDependent(Utils.CellNumbersToId(_columnCount - 1, row)))
+                        if (_graph.HasDependent(Utils.CellNumbersToId(_columnCount - 1, row)))
                             throw new DeleteLineDependentException();
                 }
             }
@@ -113,7 +113,7 @@ namespace TableCalculator.Data
                         if (Contains(Utils.CellNumbersToId(col, _rowCount - 1)))
                             throw new DeleteLineNotEmptyException();
                     for (int col = 0; col < ColumnCount; col++)
-                        if (_graph.IsDependent(Utils.CellNumbersToId(col, _rowCount - 1)))
+                        if (_graph.HasDependent(Utils.CellNumbersToId(col, _rowCount - 1)))
                             throw new DeleteLineDependentException();
                 }
             }

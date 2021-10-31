@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace TableCalculator.Calculating
 {
-    class CalculatorVisitor : CalculatorBaseVisitor<double>
+    internal class CalculatorVisitor : CalculatorBaseVisitor<double>
     {
         private readonly Func<string, double> _getValue;
 

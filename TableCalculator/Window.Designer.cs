@@ -1,7 +1,7 @@
 ﻿
 namespace TableCalculator
 {
-    partial class Window
+    internal partial class Window
     {
         /// <summary>
         /// Required designer variable.

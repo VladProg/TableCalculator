@@ -2,7 +2,7 @@
 
 namespace TableCalculator.Data
 {
-    abstract class DeleteLineException : Exception { }
-    class DeleteLineNotEmptyException : DeleteLineException { }
-    class DeleteLineDependentException : DeleteLineException { }
+    public abstract class DeleteLineException : Exception { }
+    public class DeleteLineNotEmptyException : DeleteLineException { }
+    public class DeleteLineDependentException : DeleteLineException { }
 }

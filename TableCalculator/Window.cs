@@ -8,7 +8,7 @@ using TableCalculator.Data;
 
 namespace TableCalculator
 {
-    public partial class Window : Form
+    internal partial class Window : Form
     {
         private Table _table;
         private bool _wasCycle = false;

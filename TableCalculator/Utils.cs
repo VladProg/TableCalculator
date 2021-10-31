@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace TableCalculator
 {
-    static class Utils
+    public static class Utils
     {
         public static string ColumnNumberToId(int num)
         {
@@ -35,8 +35,8 @@ namespace TableCalculator
             foreach (char c in id)
                 if (c < 'A' || c > 'Z')
                     throw new ArgumentException("Id must contain only English letters", nameof(id));
-            if (id.Length > 6)
-                throw new ArgumentOutOfRangeException(nameof(id));
+            if (id.Length < 1 || id.Length > 6)
+                throw new ArgumentException(nameof(id));
             id = id.ToUpper();
             int number = 0;
             int pow = 1;
@@ -61,7 +61,7 @@ namespace TableCalculator
             {
                 int num = int.Parse(id) - 1;
                 if (num < 0)
-                    throw new ArgumentOutOfRangeException(nameof(id));
+                    throw new ArgumentException(nameof(id));
                 return num;
             }
             catch (FormatException fe)

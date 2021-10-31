@@ -2,7 +2,7 @@
 
 namespace TableCalculator.Data
 {
-    class Graph
+    public class Graph
     {
         private readonly Dictionary<string, List<string>> _forwardEdges = new();
         private readonly Dictionary<string, HashSet<string>> _backwardEdges = new();
@@ -11,7 +11,7 @@ namespace TableCalculator.Data
         public bool IsCycle(string node)
             => _cycle.Contains(node);
 
-        public bool IsDependent(string node)
+        public bool HasDependent(string node)
             => _backwardEdges.ContainsKey(node) && _backwardEdges[node].Count > 0;
 
         private List<string> TopSort(string node, HashSet<string> used = null, List<string> result = null)

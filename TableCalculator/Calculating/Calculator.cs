@@ -4,7 +4,7 @@ using System;
 
 namespace TableCalculator.Calculating
 {
-    class Calculator
+    public class Calculator
     {
         private readonly CalculatorVisitor _visitor;
 

@@ -1,6 +1,6 @@
 ﻿namespace TableCalculator.Data
 {
-    class Cell
+    internal class Cell
     {
         public string Expression;
         public double? Result;
