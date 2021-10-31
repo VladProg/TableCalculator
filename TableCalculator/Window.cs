@@ -95,6 +95,7 @@ namespace TableCalculator
                 for (int row = 0; row < _table.RowCount; row++)
                     WriteToCell(col, row);
             dataGridView.CurrentCellChanged += dataGridView_CurrentCellChanged;
+            UpdateTitle();
         }
 
         public Window()
@@ -139,13 +140,14 @@ namespace TableCalculator
                 return true;
             try
             {
-                List<string> changed = _table.ChangeOrDeleteCell(Utils.CellNumbersToId(Column(), Row()), expression);
+                List<string> changed = _table.ChangeOrDeleteCell(CellId(), expression);
                 foreach (var id in changed)
                 {
                     var (col, row) = Utils.CellIdToNumbers(id);
                     WriteToCell(col, row);
                 }
                 dataGridView_CurrentCellChanged(dataGridView, new());
+                UpdateTitle();
                 return true;
             }
             catch (SyntaxErrorException)
@@ -210,6 +212,7 @@ namespace TableCalculator
             dataGridView.Columns.Add(Utils.ColumnNumberToId(i), Utils.ColumnNumberToId(i));
             dataGridView.Columns[i].FillWeight = 1;
             dataGridView.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
+            UpdateTitle();
         }
 
         private void buttonAddRow_Click(object sender, EventArgs e)
@@ -219,6 +222,7 @@ namespace TableCalculator
             int i = dataGridView.RowCount;
             dataGridView.Rows.Add();
             dataGridView.Rows[i].HeaderCell.Value = Utils.RowNumberToId(i);
+            UpdateTitle();
         }
 
         private void buttonRemoveColumn_Click(object sender, EventArgs e)
@@ -244,6 +248,7 @@ namespace TableCalculator
                 return;
             }
             dataGridView.Columns.RemoveAt(dataGridView.Columns.Count - 1);
+            UpdateTitle();
         }
 
         private void buttonRemoveRow_Click(object sender, EventArgs e)
@@ -269,6 +274,7 @@ namespace TableCalculator
                 return;
             }
             dataGridView.Rows.RemoveAt(dataGridView.Rows.Count - 1);
+            UpdateTitle();
         }
 
         private void textBoxId_Leave(object sender, EventArgs e)
@@ -350,6 +356,7 @@ namespace TableCalculator
             if (!CanCLick())
                 return;
             Save();
+            UpdateTitle();
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -357,6 +364,7 @@ namespace TableCalculator
             if (!CanCLick())
                 return;
             SaveAs();
+            UpdateTitle();
         }
 
         /// <summary>
@@ -630,5 +638,11 @@ namespace TableCalculator
             rtb.LinkClicked += (sender, e) => Process.Start("explorer.exe", e.LinkText);
             form.Show();
         }
+
+        /// <summary>
+        /// оновлює заголовок вікна
+        /// </summary>
+        private void UpdateTitle()
+            => Text = (_table.Saved ? "" : "* ") + Path.GetFileName(_table.FileName ?? "Нова таблиця") + " – Табличний калькулятор";
     }
 }

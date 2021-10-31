@@ -189,7 +189,6 @@ namespace TableCalculator.Data
         /// <returns>список комірок, що змінилися</returns>
         public List<string> ChangeOrDeleteCell(string id, string expression)
         {
-            Saved = false;
             if (expression is not null && expression.Trim().Length > 0)
                 return ChangeCell(id, expression);
             else
@@ -206,6 +205,8 @@ namespace TableCalculator.Data
         {
             if (!Exsists(id))
                 throw new ArgumentOutOfRangeException(nameof(id));
+            if (Contains(id) && GetExpression(id) == expression)
+                return new();
             List<string> depends = _calculator.Depends(expression);
             foreach (var cur in depends)
                 if (!Exsists(cur))
@@ -220,6 +221,7 @@ namespace TableCalculator.Data
                 else
                     cell.Result = _calculator.Evaluate(cell.Expression);
             }
+            Saved = false;
             return changed;
         }
 
@@ -230,6 +232,8 @@ namespace TableCalculator.Data
         /// <returns>список комірок, що змінилися</returns>
         private List<string> DeleteCell(string id)
         {
+            if (!Contains(id))
+                return new();
             _cells.Remove(id);
             List<string> changed = _graph.ChangeNode(id, new());
             foreach (string cur in changed)
@@ -242,6 +246,7 @@ namespace TableCalculator.Data
                 else
                     cell.Result = _calculator.Evaluate(cell.Expression);
             }
+            Saved = false;
             return changed;
         }
     }
