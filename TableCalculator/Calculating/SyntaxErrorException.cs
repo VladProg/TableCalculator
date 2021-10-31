@@ -2,7 +2,8 @@
 
 namespace TableCalculator.Calculating
 {
-    public class SyntaxErrorException : Exception
-    {
-    }
+    /// <summary>
+    /// у виразі синтаксична помилка
+    /// </summary>
+    public class SyntaxErrorException : Exception { }
 }

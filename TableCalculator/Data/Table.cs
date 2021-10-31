@@ -5,12 +5,28 @@ using TableCalculator.Calculating;
 
 namespace TableCalculator.Data
 {
+    /// <summary>
+    /// таблиця: її розміри, вміст, файл
+    /// </summary>
     public class Table
     {
+        /// словник комірок: ім'я -> Cell
         private readonly Dictionary<string, Cell> _cells = new();
+
+        /// поточний граф
         private readonly Graph _graph = new();
+
+        /// поточний калькулятор
         private readonly Calculator _calculator;
+
+        /// <summary>
+        /// ім'я файлу, у якому збережена таблиця (або null, якщо таблицю ще не зберігали)
+        /// </summary>
         public string FileName { get; private set; }
+
+        /// <summary>
+        /// false, якщо в таблиці є незбережені зміни
+        /// </summary>
         public bool Saved { get; private set; }
 
         public Table(int columnCount = 1, int rowCount = 1)
@@ -46,10 +62,13 @@ namespace TableCalculator.Data
             Saved = true;
         }
 
+        /// <summary>
+        /// зберегти таблицю в поточний файл
+        /// </summary>
         public void Save()
         {
             if (FileName is null)
-                throw new InvalidOperationException("File was never saved before");
+                throw new InvalidOperationException("Table was never saved before");
             if (Saved)
                 return;
             using StreamWriter sw = new(FileName);
@@ -59,6 +78,10 @@ namespace TableCalculator.Data
             Saved = true;
         }
 
+        /// <summary>
+        /// зберегти таблицю в новий файл
+        /// </summary>
+        /// <param name="fileName">ім'я файлу, куди зберігати таблицю</param>
         public void SaveAs(string fileName)
         {
             FileName = fileName;
@@ -67,7 +90,9 @@ namespace TableCalculator.Data
         }
 
         private int _columnCount = 1;
-
+        /// <summary>
+        /// кількість стовпчиків таблиці
+        /// </summary>
         public int ColumnCount
         {
             get => _columnCount;
@@ -94,6 +119,9 @@ namespace TableCalculator.Data
         }
 
         private int _rowCount = 1;
+        /// <summary>
+        /// кількість рядків таблиці
+        /// </summary>
         public int RowCount
         {
             get => _rowCount;
@@ -119,16 +147,46 @@ namespace TableCalculator.Data
             }
         }
 
+        /// <summary>
+        /// чи записано щось у задану комірку
+        /// </summary>
+        /// <param name="id">ім'я цієї комірки</param>
+        /// <returns>true, якщо комірка непорожня</returns>
         public bool Contains(string id) => _cells.ContainsKey(id);
+
+        /// <summary>
+        /// вираз, що записаний у задану комірку
+        /// </summary>
+        /// <param name="id">ім'я цієї комірки</param>
+        /// <returns>string - цей вираз</returns>
         public string GetExpression(string id) => _cells[id].Expression;
+
+        /// <summary>
+        /// значення, що знаходиться у заданій комірці
+        /// </summary>
+        /// <param name="id">ім'я цієї комірки</param>
+        /// <returns>double? - це значення або null, якщо це циклічне посилання</returns>
         public double? GetResult(string id) => _cells[id].Result;
 
+        /// <summary>
+        /// чи існує задана комірка
+        /// </summary>
+        /// <param name="id">ім'я цієї комірки</param>
+        /// <returns>true, якщо координати комірки менші за розміри таблиці</returns>
         public bool Exsists(string id)
         {
             var (col, row) = Utils.CellIdToNumbers(id);
             return col < ColumnCount && row < RowCount;
         }
 
+        /// <summary>
+        /// змінює задану комірку
+        /// якщо заданий вираз непорожній, то записує його в комірку
+        /// якщо заданий вираз порожній, то видаляє запис із комірки
+        /// </summary>
+        /// <param name="id">ім'я цієї комірки</param>
+        /// <param name="expression">потрібний вираз</param>
+        /// <returns>список комірок, що змінилися</returns>
         public List<string> ChangeOrDeleteCell(string id, string expression)
         {
             Saved = false;
@@ -138,6 +196,12 @@ namespace TableCalculator.Data
                 return DeleteCell(id);
         }
 
+        /// <summary>
+        /// змінює задану комірку, записує в неї заданий вираз
+        /// </summary>
+        /// <param name="id">ім'я цієї комірки</param>
+        /// <param name="expression">потрібний вираз</param>
+        /// <returns>список комірок, що змінилися</returns>
         private List<string> ChangeCell(string id, string expression)
         {
             if (!Exsists(id))
@@ -159,6 +223,11 @@ namespace TableCalculator.Data
             return changed;
         }
 
+        /// <summary>
+        /// змінює задану комірку, видаляє з неї запис
+        /// </summary>
+        /// <param name="id">ім'я цієї комірки</param>
+        /// <returns>список комірок, що змінилися</returns>
         private List<string> DeleteCell(string id)
         {
             _cells.Remove(id);

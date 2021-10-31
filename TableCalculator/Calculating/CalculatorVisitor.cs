@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace TableCalculator.Calculating
 {
+    /// <summary>
+    /// патерн "відвідувач"
+    /// </summary>
     internal class CalculatorVisitor : CalculatorBaseVisitor<double>
     {
         private readonly Func<string, double> _getValue;

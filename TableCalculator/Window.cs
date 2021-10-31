@@ -10,9 +10,17 @@ namespace TableCalculator
 {
     internal partial class Window : Form
     {
+        /// поточна таблиця
         private Table _table;
+
+        /// чи був колись цикл
         private bool _wasCycle = false;
 
+        /// <summary>
+        /// дізнається значення комірки з _table і записує його в dataGrivView
+        /// </summary>
+        /// <param name="col">номер стовпчика</param>
+        /// <param name="row">номер рядка</param>
         private void WriteToCell(int col, int row)
         {
             if (dataGridView.CurrentCell is not null
@@ -44,15 +52,29 @@ namespace TableCalculator
             dataGridView.CellValueChanged += dataGridView_CellValueChanged;
         }
 
+        /// <summary>
+        /// номер стовпчика, у якому знаходиться виділена комірка,
+        /// або -1, якщо жодна комірка не виділена (це буває, коли програма тільки розпочинає роботу)
+        /// </summary>
         private int Column()
             => dataGridView.CurrentCell?.ColumnIndex ?? -1;
 
+        /// <summary>
+        /// номер рядка, у якому знаходиться виділена комірка,
+        /// або -1, якщо жодна комірка не виділена (це буває, коли програма тільки розпочинає роботу)
+        /// </summary>
         private int Row()
             => dataGridView.CurrentCell?.RowIndex ?? -1;
 
+        /// <summary>
+        /// ім'я виділеної комірки
+        /// </summary>
         private string CellId()
             => Utils.CellNumbersToId(Column(),Row());
 
+        /// <summary>
+        /// встановлює потрібний розмір dataGrivView і заповнює комірки
+        /// </summary>
         private void FillDataGrivView()
         {
             dataGridView.CurrentCellChanged -= dataGridView_CurrentCellChanged;
@@ -105,6 +127,12 @@ namespace TableCalculator
             }
         }
 
+        /// <summary>
+        /// намагається записати вираз expression у виділену комірку в _table,
+        /// якщо вираз помилковий, створює повідомлення про помилку
+        /// </summary>
+        /// <param name="expression">вираз, що потрібно записати</param>
+        /// <returns>true, якщо не виникла помилка</returns>
         private bool Apply(string expression)
         {
             if (Column() == -1 || Row() == -1)
@@ -246,6 +274,10 @@ namespace TableCalculator
         private void textBoxId_Leave(object sender, EventArgs e)
             => textBoxId.Text = CellId();
 
+        /// <summary>
+        /// ця функція викликається при спробі натиснути на пункт меню
+        /// </summary>
+        /// <returns>true, якщо зараз ніяка комірка не редагується</returns>
         bool CanCLick()
         {
             if (dataGridView.IsCurrentCellInEditMode)
@@ -262,6 +294,10 @@ namespace TableCalculator
             return true;
         }
 
+        /// <summary>
+        /// зберігає файл
+        /// </summary>
+        /// <returns>true, якщо файл успішно збережено</returns>
         bool Save()
         {
             if (_table.FileName is null)
@@ -279,6 +315,10 @@ namespace TableCalculator
                 }
         }
 
+        /// <summary>
+        /// зберігає файл як
+        /// </summary>
+        /// <returns>true, якщо файл успішно збережено</returns>
         bool SaveAs()
         {
             SaveFileDialog sfd = new();
@@ -319,6 +359,10 @@ namespace TableCalculator
             SaveAs();
         }
 
+        /// <summary>
+        /// викликається при спробі закрити файл
+        /// </summary>
+        /// <returns>true, якщо у файлі немає незбережених змін</returns>
         private bool CheckSaved()
         {
             if (_table is null || _table.Saved)
