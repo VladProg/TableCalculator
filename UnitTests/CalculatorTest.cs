@@ -80,6 +80,8 @@ namespace UnitTests
             CheckExpression("24 mod -10", -6);
             CheckExpression("-24 div -10", 2);
             CheckExpression("-24 mod -10", -4);
+            CheckExpression("A1 div A2", 3, new() { { "A1", 1.7 }, { "A2", 0.5 } });
+            CheckExpression("A1 mod A2", 0.2, new() { { "A1", 1.7 }, { "A2", 0.5 } });
             CheckExpression("24^10", 63403380965376);
             CheckExpression("mmin(24)", 24);
             CheckExpression("mmax(24)", 24);
