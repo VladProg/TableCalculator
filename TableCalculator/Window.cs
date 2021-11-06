@@ -495,6 +495,7 @@ namespace TableCalculator
                     Apply(_table.Contains(CellId()) ? _table.GetExpression(CellId()) : "");
                     dataGridView.Focus();
                     dataGridView_CurrentCellChanged(dataGridView, new());
+                    WriteToCell(Column(), Row());
                     e.Handled = true;
                     e.SuppressKeyPress = true;
                     break;
